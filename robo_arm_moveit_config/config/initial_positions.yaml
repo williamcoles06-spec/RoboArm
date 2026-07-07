@@ -1,0 +1,9 @@
+# Default initial positions for robo_arm_simplified_for_urdf_v2_1's ros2_control fake system
+
+initial_positions:
+  revolute_1: 0
+  revolute_2: 0
+  revolute_3: 0
+  revolute_4: 0
+  revolute_5: 0
+  revolute_6: 0

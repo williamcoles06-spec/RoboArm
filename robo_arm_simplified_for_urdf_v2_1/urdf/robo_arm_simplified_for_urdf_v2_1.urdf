@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="robo_arm_simplified_for_urdf_v2_1">
+    <link name="link_0">
+        <inertial>
+            <mass value="2.0" />
+            <origin xyz="-0.000294655 -1.03725e-07 0.0201983" rpy="0 -0 0" />
+            <inertia ixx="7.471134623e-03" ixy="1.912209621e-08" ixz="-8.578050636e-06" iyy="7.434210294e-03" iyz="8.769430831e-09" izz="9.367385574e-03" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_0.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.450980_0.450980_0.450980_0.000000_0.000000">
+                <color rgba="0.45098 0.45098 0.45098 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="0 0 0" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_0.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_1">
+        <inertial>
+            <mass value="1.5" />
+            <origin xyz="4.68366e-05 0.00706407 0.0362116" rpy="0 -0 0" />
+            <inertia ixx="2.010143095e-03" ixy="3.348344661e-06" ixz="-6.669731625e-07" iyy="1.607465088e-03" iyz="-8.524039893e-05" izz="1.763545460e-03" />
+        </inertial>
+        <visual>
+            <origin xyz="0 3.9968e-17 -0.1037" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_1.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="0 3.9968e-17 -0.1037" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_1.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_2">
+        <inertial>
+            <mass value="1.2" />
+            <origin xyz="2.62802e-09 0.0144737 0.13931" rpy="0 -0 0" />
+            <inertia ixx="1.013453901e-02" ixy="-1.020169215e-10" ixz="-3.118661714e-10" iyy="1.018596490e-02" iyz="-5.339363745e-04" izz="9.328297103e-04" />
+        </inertial>
+        <visual>
+            <origin xyz="7.13054e-18 -0.0640254 -0.149475" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_2.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="7.13054e-18 -0.0640254 -0.149475" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_2.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_3">
+        <inertial>
+            <mass value="0.8" />
+            <origin xyz="0.000116996 -0.0362078 -0.00999308" rpy="0 -0 0" />
+            <inertia ixx="8.325765182e-04" ixy="4.176102797e-07" ixz="3.435971198e-06" iyy="7.714774485e-04" iyz="-2.329820872e-05" izz="6.054819903e-04" />
+        </inertial>
+        <visual>
+            <origin xyz="-3.22488e-17 -0.0390456 -0.389475" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_3.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="-3.22488e-17 -0.0390456 -0.389475" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_3.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_4">
+        <inertial>
+            <mass value="0.5" />
+            <origin xyz="-0.000557991 0.0653842 -5.2404e-06" rpy="0 -0 0" />
+            <inertia ixx="1.083402757e-03" ixy="-3.515899200e-06" ixz="8.995130842e-08" iyy="3.731176748e-04" iyz="-1.961422672e-05" izz="1.004595475e-03" />
+        </inertial>
+        <visual>
+            <origin xyz="2.6168e-05 0.1245 -0.0251007" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_4.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="2.6168e-05 0.1245 -0.0251007" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_4.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_5">
+        <inertial>
+            <mass value="0.3" />
+            <origin xyz="3.27047e-12 0.00336436 -0.0170378" rpy="0 -0 0" />
+            <inertia ixx="4.468811064e-05" ixy="0.000000000e+00" ixz="0.000000000e+00" iyy="3.497156666e-05" iyz="6.348425998e-08" izz="2.189554239e-05" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 -0.0422014" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_5.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="0 0 -0.0422014" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_5.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="link_6">
+        <inertial>
+            <mass value="0.2" />
+            <origin xyz="-6.47991e-07 0.00784846 -7.47187e-09" rpy="0 -0 0" />
+            <inertia ixx="4.232810009e-05" ixy="1.492988624e-10" ixz="0.000000000e+00" iyy="7.799925759e-05" iyz="0.000000000e+00" izz="4.326789964e-05" />
+        </inertial>
+        <visual>
+            <origin xyz="2.6168e-05 -0.0201 -0.0251007" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_6.stl" scale="1 1 1" />
+            </geometry>
+            <material name="0.964706_0.964706_0.952941_0.000000_0.000000">
+                <color rgba="0.964706 0.964706 0.952941 1" />
+            </material>
+        </visual>
+    <collision><origin xyz="2.6168e-05 -0.0201 -0.0251007" rpy="0 -0 0" />
+            <geometry>
+                <mesh filename="package://robo_arm_simplified_for_urdf_v2_1/meshes/Link_6.stl" scale="1 1 1" />
+            </geometry>
+            </collision></link>
+    <link name="mate_connector_1">
+        <inertial>
+            <mass value="1e-09" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
+        </inertial>
+    </link>
+    <link name="mate_connector_2">
+        <inertial>
+            <mass value="1e-09" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
+        </inertial>
+    </link>
+    <link name="mate_connector_3">
+        <inertial>
+            <mass value="1e-09" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
+        </inertial>
+    </link>
+    <link name="mate_connector_4">
+        <inertial>
+            <mass value="1e-09" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
+            <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
+        </inertial>
+    </link>
+    <link name="root" />
+    <joint name="fixed_node_to_root_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 -0 0" />
+        <axis xyz="0 0 1" />
+        <parent link="root" />
+        <child link="link_0" />
+    </joint>
+    <joint name="mate_connector_1" type="fixed">
+        <origin xyz="0 0 0" rpy="0 1.57917e-60 0" />
+        <axis xyz="0 0 1" />
+        <parent link="link_5" />
+        <child link="mate_connector_1" />
+    </joint>
+    <joint name="mate_connector_2" type="fixed">
+        <origin xyz="2.6168e-05 0.1245 0.0171007" rpy="3.14159 -3.96548e-61 0" />
+        <axis xyz="0 0 1" />
+        <parent link="link_4" />
+        <child link="mate_connector_2" />
+    </joint>
+    <joint name="mate_connector_3" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.5708 0 0" />
+        <axis xyz="0 0 1" />
+        <parent link="link_3" />
+        <child link="mate_connector_3" />
+    </joint>
+    <joint name="mate_connector_4" type="fixed">
+        <origin xyz="-1.21353e-15 -0.0249798 0.24" rpy="1.5708 -0 0" />
+        <axis xyz="0 0 1" />
+        <parent link="link_2" />
+        <child link="mate_connector_4" />
+    </joint>
+    <joint name="revolute_1" type="continuous">
+        <origin xyz="-1.49235e-17 7.11621e-24 0.1037" rpy="0 -0 0" />
+        <axis xyz="-0 -0 -1" />
+        <parent link="link_0" />
+        <child link="link_1" />
+    </joint>
+    <joint name="revolute_2" type="revolute">
+        <origin xyz="7.79295e-18 0.0640254 0.0457749" rpy="0 -0 0" />
+        <axis xyz="-0 -1 -0" />
+        <parent link="link_1" />
+        <child link="link_2" />
+        <limit effort="1" velocity="1" lower="-1.91986" upper="1.91986" />
+    </joint>
+    <joint name="revolute_3" type="continuous">
+        <origin xyz="3.93793e-17 -0.0249798 0.24" rpy="0 -0 0" />
+        <axis xyz="-0 1 -0" />
+        <parent link="link_2" />
+        <child link="link_3" />
+    </joint>
+    <joint name="revolute_4" type="continuous">
+        <origin xyz="3.9942e-16 -0.0404996 0.0353704" rpy="1.5708 2.36656e-17 1.75506e-29" />
+        <axis xyz="-0 -1 -0" />
+        <parent link="link_3" />
+        <child link="link_4" />
+    </joint>
+    <joint name="revolute_5" type="revolute">
+        <origin xyz="2.6168e-05 0.1245 0.0171007" rpy="-8.03191e-32 3.96004e-63 9.86076e-32" />
+        <axis xyz="-0 -0 1" />
+        <parent link="link_4" />
+        <child link="link_5" />
+        <limit effort="1" velocity="1" lower="-1.5708" upper="1.5708" />
+    </joint>
+    <joint name="revolute_6" type="continuous">
+        <origin xyz="1.12164e-16 0.0201 -0.0171007" rpy="-7.61227e-32 1.06671e-76 2.8026e-45" />
+        <axis xyz="-0 -1 -0" />
+        <parent link="link_5" />
+        <child link="link_6" />
+    </joint>
+</robot>
