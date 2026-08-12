@@ -33,5 +33,10 @@ def generate_launch_description():
         cwd=ARM_DRIVER_DIR,
         output="screen",
     )
+    waypoint_gui = ExecuteProcess(
+        cmd=["python3", "waypoint_gui.py"],
+        cwd=ARM_DRIVER_DIR,
+        output="screen",
+    )
 
-    return LaunchDescription([rsp, move_group, rviz, canbus_bridge])
+    return LaunchDescription([rsp, move_group, rviz, canbus_bridge, waypoint_gui])

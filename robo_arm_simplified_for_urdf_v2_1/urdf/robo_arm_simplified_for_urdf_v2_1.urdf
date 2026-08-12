@@ -199,7 +199,7 @@
         <parent link="link_2" />
         <child link="mate_connector_4" />
     </joint>
-    <joint name="revolute_1" type="continuous">
+    <joint name="revolute_1" type="revolute">
         <!-- yaw = -90 deg: corrects rest pose to match the physical home
              (chosen for wiring constraints, ROBOT_ARM_HANDOFF.md §3) - the
              CAD export's zero pose did not match it. See §7 test 4 notes. -->
@@ -207,6 +207,12 @@
         <axis xyz="-0 -0 -1" />
         <parent link="link_0" />
         <child link="link_1" />
+        <!-- was type="continuous" with no limit tag - real range is -135deg to
+             +210deg (wiring constraint, corrected 2026-08-12). continuous joints
+             plan/interpolate in a wraparound space regardless of joint_limits.yaml,
+             which caused GUI values >180deg to normalize incorrectly and Execute
+             to fail on out-of-wrap trajectories. -->
+        <limit effort="1" velocity="1" lower="-2.356194" upper="3.665191" />
     </joint>
     <joint name="revolute_2" type="revolute">
         <origin xyz="7.79295e-18 0.0640254 0.0457749" rpy="0 -0 0" />
@@ -215,13 +221,17 @@
         <child link="link_2" />
         <limit effort="1" velocity="1" lower="-1.91986" upper="1.91986" />
     </joint>
-    <joint name="revolute_3" type="continuous">
+    <joint name="revolute_3" type="revolute">
         <origin xyz="3.93793e-17 -0.0249798 0.24" rpy="0 -0 0" />
         <axis xyz="-0 1 -0" />
         <parent link="link_2" />
         <child link="link_3" />
+        <!-- was type="continuous" with no limit tag - real range is -45deg to
+             +405deg (verified 2026-08-11), see revolute_1 comment above for why
+             continuous joints without a limit tag broke MoveIt's planning here. -->
+        <limit effort="1" velocity="1" lower="-0.785398" upper="7.068583" />
     </joint>
-    <joint name="revolute_4" type="continuous">
+    <joint name="revolute_4" type="revolute">
         <!-- extra -90 deg about the local roll axis (on top of the existing
              90 deg from CAD): corrects rest pose to match the physical home,
              same reasoning as revolute_1 above. -->
@@ -229,6 +239,9 @@
         <axis xyz="-0 -1 -0" />
         <parent link="link_3" />
         <child link="link_4" />
+        <!-- was type="continuous" with no limit tag - real range is +-180deg,
+             see revolute_1 comment above for why that broke MoveIt's planning. -->
+        <limit effort="1" velocity="1" lower="-3.141593" upper="3.141593" />
     </joint>
     <joint name="revolute_5" type="revolute">
         <origin xyz="2.6168e-05 0.1245 0.0171007" rpy="-8.03191e-32 3.96004e-63 9.86076e-32" />
@@ -237,10 +250,13 @@
         <child link="link_5" />
         <limit effort="1" velocity="1" lower="-1.5708" upper="1.5708" />
     </joint>
-    <joint name="revolute_6" type="continuous">
+    <joint name="revolute_6" type="revolute">
         <origin xyz="1.12164e-16 0.0201 -0.0171007" rpy="-7.61227e-32 1.06671e-76 2.8026e-45" />
         <axis xyz="-0 -1 -0" />
         <parent link="link_5" />
         <child link="link_6" />
+        <!-- was type="continuous" with no limit tag - real range is +-180deg roll,
+             see revolute_1 comment above for why that broke MoveIt's planning. -->
+        <limit effort="1" velocity="1" lower="-3.141593" upper="3.141593" />
     </joint>
 </robot>

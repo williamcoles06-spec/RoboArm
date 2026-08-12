@@ -9,8 +9,8 @@ default_acceleration_scaling_factor: 0.1
 joint_limits:
   revolute_1:
     has_position_limits: true
-    min_position: -3.141593   # -180 deg
-    max_position: 3.141593    # +180 deg
+    min_position: -2.356194   # -135 deg (corrected 2026-08-12, asymmetric wiring limit like J3)
+    max_position: 3.665191    # +210 deg
     has_velocity_limits: true
     max_velocity: 1.034439    # 1600 motor-deg/s / 27
     has_acceleration_limits: true

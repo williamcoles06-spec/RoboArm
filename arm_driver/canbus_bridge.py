@@ -49,6 +49,27 @@ NORMAL_SPEED_ARM_DEG_S = 1600.0   # must match the flashed value in §3
 NORMAL_SPEED_WRIST_DEG_S = 6400.0
 HOMING_SETTLE_S = 3.0             # crude wait for the homing creep to finish
 
+# Arrival verification (§ post-2026-08-13 fix): execute_trajectory used to
+# declare success once it had sent every commanded point and the nominal
+# duration elapsed, without ever checking the encoders actually got there.
+# If a trajectory got overridden mid-flight (e.g. two goals in flight at
+# once), it would still report success. Now it polls real encoder positions
+# against the final commanded point before succeeding.
+ARRIVAL_TOLERANCE_RAD = 0.02
+ARRIVAL_TIMEOUT_S = 3.0
+ARRIVAL_POLL_INTERVAL_S = 0.1
+
+# Root-caused 2026-08-13: MoveIt's time-parameterized trajectories pack in a new
+# waypoint roughly every 0.1s. These boards run their OWN onboard trapezoidal
+# motion profile per set_position() command - getting redirected to a new target
+# every 0.1s never gives that profile time to actually accelerate, so the arm
+# just twitches near its starting point for the whole trajectory instead of
+# traveling. Downsample to give the board real time to move between updates,
+# while still following the same overall path MoveIt validated as collision-free
+# (never skip straight from start to the final point - that would throw away the
+# collision-avoiding shape of the path).
+MIN_SEND_INTERVAL_S = 0.5
+
 # ---------------------------------------------------------------------------
 # 1. CONFIG - the only place signs/offsets/limits should be edited.
 # ---------------------------------------------------------------------------
@@ -57,8 +78,10 @@ HOMING_SETTLE_S = 3.0             # crude wait for the homing creep to finish
 # All values from ROBOT_ARM_HANDOFF.md §3.
 JOINTS = {
     # dir verified 2026-08-11: physical moved opposite RViz at dir=-1, flipped to +1.
+    # limits corrected 2026-08-12: wiring is asymmetric about home, like J3 - real
+    # safe range is -135deg to +210deg, not symmetric +-180.
     "revolute_1": {"node_id": 1, "ratio": 27.0, "dir": 1,
-                   "home_deg": -52.65, "min_rad": math.radians(-180), "max_rad": math.radians(180)},
+                   "home_deg": -52.65, "min_rad": math.radians(-135), "max_rad": math.radians(210)},
     # dir verified 2026-08-11: physical moved opposite RViz at dir=-1, flipped to +1.
     "revolute_2": {"node_id": 2, "ratio": 27.0, "dir": 1,
                    "home_deg": 236.81, "min_rad": math.radians(-90), "max_rad": math.radians(90)},
@@ -91,24 +114,21 @@ ALL_JOINTS = ["revolute_1", "revolute_2", "revolute_3",
 # 2. CONVERSIONS
 # ---------------------------------------------------------------------------
 
-def wrap_deg(delta_deg):
-    """Normalize a degree difference to the shortest path across the ±360 wrap."""
-    return ((delta_deg + 180) % 360) - 180
-
-
 def joint_to_motor_deg(cfg, joint_rad):
     return math.degrees(joint_rad) * cfg["ratio"] * cfg["dir"] + cfg["home_deg"]
 
 
 def motor_to_joint_rad(cfg, motor_deg):
-    delta = wrap_deg(motor_deg - cfg["home_deg"])
+    """The boards report real, multi-revolution-aware absolute position
+    directly (not a wrapped single-turn value) - plain offset-then-divide."""
+    delta = motor_deg - cfg["home_deg"]
     return math.radians(delta / (cfg["ratio"] * cfg["dir"]))
 
 
 def wrist_forward(m5_deg, m6_deg):
     """Motor degrees -> (pitch_rad, roll_rad)."""
-    d5 = wrap_deg(m5_deg - WRIST["home5_deg"]) * WRIST["s5"]
-    d6 = wrap_deg(m6_deg - WRIST["home6_deg"]) * WRIST["s6"]
+    d5 = (m5_deg - WRIST["home5_deg"]) * WRIST["s5"]
+    d6 = (m6_deg - WRIST["home6_deg"]) * WRIST["s6"]
     pitch = math.radians((d5 + d6) / (2 * WRIST["R"]))
     roll = math.radians((d5 - d6) / (2 * WRIST["R"]))
     return pitch, roll
@@ -128,6 +148,7 @@ class CanbusBridge(Node):
         super().__init__("canbus_bridge")
         self.bus = CANBus(SERIAL_PORT)
         self.bus_lock = threading.Lock()
+        self.execution_lock = threading.Lock()  # only one trajectory may drive the motors at a time
 
         self.nodes = {name: self.bus.node(cfg["node_id"]) for name, cfg in JOINTS.items()}
         self.node5 = self.bus.node(WRIST["node5_id"])
@@ -229,6 +250,9 @@ class CanbusBridge(Node):
         return True
 
     def handle_goal(self, goal_request):
+        if self.execution_lock.locked():
+            self.get_logger().warn("goal rejected: a trajectory is already executing")
+            return GoalResponse.REJECT
         names = goal_request.trajectory.joint_names
         if not set(names) <= set(ALL_JOINTS):
             self.get_logger().warn(f"goal rejected: unknown joint(s) in {names}")
@@ -253,13 +277,79 @@ class CanbusBridge(Node):
                 self.node5.set_position(m5)
                 self.node6.set_position(m6)
 
+    def read_joint_positions(self, names):
+        """Read live encoder positions (radians) for whichever of ALL_JOINTS are named."""
+        with self.bus_lock:
+            current = {}
+            for name in names:
+                if name in JOINTS:
+                    current[name] = motor_to_joint_rad(JOINTS[name], self.nodes[name].get_angle())
+            if "revolute_5" in names or "revolute_6" in names:
+                pitch, roll = wrist_forward(self.node5.get_angle(), self.node6.get_angle())
+                if "revolute_5" in names:
+                    current["revolute_5"] = pitch
+                if "revolute_6" in names:
+                    current["revolute_6"] = roll
+        return current
+
+    def wait_for_arrival(self, target_positions, timeout=ARRIVAL_TIMEOUT_S):
+        """Poll real encoders until within tolerance of target_positions, or timeout.
+        A transient encoder read timeout just means "not confirmed yet" - same as
+        publish_states already treats it - it must never crash this out of the
+        action callback with no result sent back to MoveGroup."""
+        names = list(target_positions.keys())
+        deadline = time.monotonic() + timeout
+        last_current = {}
+        while True:
+            try:
+                current = self.read_joint_positions(names)
+                last_current = current
+                if all(abs(current[n] - target_positions[n]) <= ARRIVAL_TOLERANCE_RAD for n in names):
+                    return True
+            except TimeoutError as e:
+                self.get_logger().warn(f"arrival check: encoder read timed out: {e}")
+            if time.monotonic() >= deadline:
+                diffs = ", ".join(
+                    f"{n}: target={target_positions[n]:.4f} actual={last_current.get(n, float('nan')):.4f} "
+                    f"diff={abs(target_positions[n] - last_current.get(n, float('nan'))):.4f}"
+                    for n in names)
+                self.get_logger().error(f"arrival check timed out - {diffs}")
+                return False
+            time.sleep(ARRIVAL_POLL_INTERVAL_S)
+
     def execute_trajectory(self, goal_handle):
+        if not self.execution_lock.acquire(blocking=False):
+            self.get_logger().warn("execute rejected: a trajectory is already executing")
+            goal_handle.abort()
+            result = FollowJointTrajectory.Result()
+            result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
+            result.error_string = "a trajectory is already executing"
+            return result
+
+        try:
+            return self._execute_trajectory_inner(goal_handle)
+        except Exception as e:
+            # Guarantees MoveGroup always gets a real response - an unhandled
+            # exception here previously meant no result was ever sent back, so
+            # MoveGroup just hung until its own timeout gave up, no matter how
+            # generous that timeout was set (see 2026-08-13 notes).
+            self.get_logger().error(f"unexpected error in trajectory execution: {e}")
+            goal_handle.abort()
+            result = FollowJointTrajectory.Result()
+            result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
+            result.error_string = f"unexpected error: {e}"
+            return result
+        finally:
+            self.execution_lock.release()
+
+    def _execute_trajectory_inner(self, goal_handle):
         traj = goal_handle.request.trajectory
         names = traj.joint_names
         result = FollowJointTrajectory.Result()
 
         start_time = time.monotonic()
-        for point in traj.points:
+        last_sent_t = None
+        for i, point in enumerate(traj.points):
             if goal_handle.is_cancel_requested:
                 goal_handle.canceled()
                 result.error_string = "canceled by client"
@@ -270,19 +360,33 @@ class CanbusBridge(Node):
             if remaining > 0:
                 time.sleep(remaining)
 
-            try:
-                self.send_joint_targets(dict(zip(names, point.positions)))
-            except Exception as e:
-                self.get_logger().error(f"trajectory execution failed: {e}")
-                goal_handle.abort()
-                result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
-                result.error_string = str(e)
-                return result
+            is_last = (i == len(traj.points) - 1)
+            should_send = (last_sent_t is None or is_last
+                           or (target_t - last_sent_t) >= MIN_SEND_INTERVAL_S)
+            if should_send:
+                try:
+                    self.send_joint_targets(dict(zip(names, point.positions)))
+                except Exception as e:
+                    self.get_logger().error(f"trajectory execution failed: {e}")
+                    goal_handle.abort()
+                    result.error_code = FollowJointTrajectory.Result.INVALID_GOAL
+                    result.error_string = str(e)
+                    return result
+                last_sent_t = target_t
 
             feedback = FollowJointTrajectory.Feedback()
             feedback.joint_names = names
             feedback.desired = point
             goal_handle.publish_feedback(feedback)
+
+        final_target = dict(zip(names, traj.points[-1].positions))
+        if not self.wait_for_arrival(final_target):
+            self.get_logger().error(
+                "trajectory finished but arm did not reach target within tolerance")
+            goal_handle.abort()
+            result.error_code = FollowJointTrajectory.Result.GOAL_TOLERANCE_VIOLATED
+            result.error_string = "did not reach commanded position within tolerance/timeout"
+            return result
 
         goal_handle.succeed()
         result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
