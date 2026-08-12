@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+
+# Cloned build dependency (PickNikRobotics), not part of this repo - see ROBOT_ARM_HANDOFF.md §4
+topic_based_ros2_control/

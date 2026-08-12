@@ -1,5 +1,9 @@
 # MoveIt uses this configuration for controller management
 
+# false: no ros2_control here (bypassed on purpose, see ROBOT_ARM_HANDOFF.md §7) -
+# MoveIt should not try to activate/switch controllers itself, just send trajectories.
+moveit_manage_controllers: false
+
 moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
 
 moveit_simple_controller_manager:
@@ -8,6 +12,8 @@ moveit_simple_controller_manager:
 
   arm_controller:
     type: FollowJointTrajectory
+    action_ns: ""   # required key (moveit_simple_controller_manager silently skips
+                    # a controller without it); empty = action name is just "arm_controller"
     joints:
       - revolute_1
       - revolute_2

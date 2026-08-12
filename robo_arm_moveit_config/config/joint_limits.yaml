@@ -1,33 +1,57 @@
+# Position limits: from ROBOT_ARM_HANDOFF.md §3 (protect the wiring looms).
+# Velocity limits: derived from the flashed per-board speed ceiling (§3), converted
+# through each joint's gear ratio so MoveIt never plans motion the hardware can't
+# execute. J1-J3 ratio 27:1, J4 ratio 5:1, both capped at the flashed 1600 motor-deg/s.
+# J5/J6 (wrist) are a differential (§6): the conservative bound below keeps BOTH motors
+# under their flashed 6400 motor-deg/s ceiling even if pitch and roll move at once.
 default_velocity_scaling_factor: 0.1
 default_acceleration_scaling_factor: 0.1
 joint_limits:
   revolute_1:
+    has_position_limits: true
+    min_position: -3.141593   # -180 deg
+    max_position: 3.141593    # +180 deg
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 1.034439    # 1600 motor-deg/s / 27
     has_acceleration_limits: true
     max_acceleration: 4.0
   revolute_2:
+    has_position_limits: true
+    min_position: -1.570796   # -90 deg
+    max_position: 1.570796    # +90 deg
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 1.034439    # 1600 motor-deg/s / 27
     has_acceleration_limits: true
     max_acceleration: 4.0
   revolute_3:
+    has_position_limits: true
+    min_position: -0.785398   # -45 deg (verified 2026-08-11, asymmetric about home)
+    max_position: 7.068583    # +405 deg
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 1.034439    # 1600 motor-deg/s / 27
     has_acceleration_limits: true
     max_acceleration: 4.0
   revolute_4:
+    has_position_limits: true
+    min_position: -3.141593   # -180 deg
+    max_position: 3.141593    # +180 deg
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 5.585054    # 1600 motor-deg/s / 5
     has_acceleration_limits: true
     max_acceleration: 4.0
   revolute_5:
+    has_position_limits: true
+    min_position: -1.570796   # -90 deg pitch
+    max_position: 1.570796    # +90 deg pitch
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 9.308997    # 6400 motor-deg/s / (2 * R=6)
     has_acceleration_limits: true
     max_acceleration: 4.0
   revolute_6:
+    has_position_limits: true
+    min_position: -3.141593   # -180 deg roll
+    max_position: 3.141593    # +180 deg roll
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 9.308997    # 6400 motor-deg/s / (2 * R=6)
     has_acceleration_limits: true
     max_acceleration: 4.0

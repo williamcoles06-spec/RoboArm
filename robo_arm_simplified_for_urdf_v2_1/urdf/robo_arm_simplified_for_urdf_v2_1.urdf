@@ -200,7 +200,10 @@
         <child link="mate_connector_4" />
     </joint>
     <joint name="revolute_1" type="continuous">
-        <origin xyz="-1.49235e-17 7.11621e-24 0.1037" rpy="0 -0 0" />
+        <!-- yaw = -90 deg: corrects rest pose to match the physical home
+             (chosen for wiring constraints, ROBOT_ARM_HANDOFF.md §3) - the
+             CAD export's zero pose did not match it. See §7 test 4 notes. -->
+        <origin xyz="-1.49235e-17 7.11621e-24 0.1037" rpy="0 0 -1.570796" />
         <axis xyz="-0 -0 -1" />
         <parent link="link_0" />
         <child link="link_1" />
@@ -219,7 +222,10 @@
         <child link="link_3" />
     </joint>
     <joint name="revolute_4" type="continuous">
-        <origin xyz="3.9942e-16 -0.0404996 0.0353704" rpy="1.5708 2.36656e-17 1.75506e-29" />
+        <!-- extra -90 deg about the local roll axis (on top of the existing
+             90 deg from CAD): corrects rest pose to match the physical home,
+             same reasoning as revolute_1 above. -->
+        <origin xyz="3.9942e-16 -0.0404996 0.0353704" rpy="1.570796 0 -1.570796" />
         <axis xyz="-0 -1 -0" />
         <parent link="link_3" />
         <child link="link_4" />
