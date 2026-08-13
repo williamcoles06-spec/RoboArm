@@ -3,7 +3,7 @@
   <name>robo_arm_simplified_for_urdf_v2_1</name>
   <version>0.1.0</version>
   <description>URDF for Will's 6-DOF robot arm</description>
-  <maintainer email="will@lsu.edu">Will Coles</maintainer>
+  <maintainer email="williamcoles06@gmail.com">Will Coles</maintainer>
   <license>MIT</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <export><build_type>ament_cmake</build_type></export>
