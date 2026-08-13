@@ -26,11 +26,11 @@ Motion planning goes through MoveIt 2, but the hardware interface underneath it 
 
 | Joint | Function | Reduction | Motor |
 |---|---|---|---|
-| J1 | Base rotation | 27:1 cycloidal | NEMA 17 |
-| J2 | Shoulder | 27:1 cycloidal | NEMA 17 |
-| J3 | Elbow | 27:1 cycloidal | NEMA 17 |
-| J4 | Forearm roll | 5:1 planetary | NEMA 17 |
-| J5 / J6 | Wrist pitch / roll | 6:1 differential | pancake stepper x2 |
+| J1 | Base rotation | 27:1 cycloidal | 38 mm NEMA 17 |
+| J2 | Shoulder | 27:1 cycloidal | 60 mm NEMA 17 |
+| J3 | Elbow | 27:1 cycloidal | 48 mm NEMA 17 |
+| J4 | Forearm roll | 5:1 planetary | 38 mm NEMA 17 |
+| J5 / J6 | Wrist pitch / roll | 6:1 differential | 2x 23mm Nema 17 |
 
 Each joint runs on a [CANBUS Stepper](https://thingsbyjosh.com) controller board (ESP32-S3, TMC2209 driver, closed-loop magnetic encoder), all chained on a single CAN bus reachable over one USB-C connection.
 
