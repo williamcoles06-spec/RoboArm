@@ -4,7 +4,7 @@ A 6-DOF robot arm I designed and built from scratch, running on a ROS 2 / MoveIt
 
 ## What this is
 
-Six joints, each driven by a stepper motor with a custom gearbox: 27:1 cycloidal drives for the base, shoulder, and elbow, a 5:1 planetary drive for the forearm roll, and a 6:1 belt-driven differential for the wrist pitch and roll. The structure is 3D printed in PLA, designed in Fusion 360.
+Six joints, each driven by a stepper motor with a custom gearbox: 27:1 cycloidal drives for the base, shoulder, and elbow, a 5:1 planetary drive for the forearm roll, and a 6:1 belt reduction into a bevel gear differential for the wrist pitch and roll. The structure is 3D printed in PLA, designed in Fusion 360.
 
 Motion planning goes through MoveIt 2, but the hardware interface underneath it is custom. The stepper controllers (CANBUS Stepper boards, closed loop, daisy chained over CAN) don't fit cleanly into `ros2_control` on this setup, so I wrote a standalone ROS 2 node that acts as the `FollowJointTrajectory` action server MoveIt talks to directly. It turns planned trajectories into CAN bus position commands, verifies the arm actually reached each target using live encoder feedback, and publishes `/joint_states` back to MoveIt.
 
@@ -30,7 +30,7 @@ Motion planning goes through MoveIt 2, but the hardware interface underneath it 
 | J2 | Shoulder | 27:1 cycloidal | 60 mm NEMA 17 |
 | J3 | Elbow | 27:1 cycloidal | 48 mm NEMA 17 |
 | J4 | Forearm roll | 5:1 planetary | 38 mm NEMA 17 |
-| J5 / J6 | Wrist pitch / roll | 6:1 differential | 2x 23mm Nema 17 |
+| J5 / J6 | Wrist pitch / roll | 6:1 belt into bevel gear differential | 2x 23mm Nema 17 |
 
 Each joint runs on a [CANBUS Stepper](https://thingsbyjosh.com) controller board (ESP32-S3, TMC2209 driver, closed-loop magnetic encoder), all chained on a single CAN bus reachable over one USB-C connection.
 
