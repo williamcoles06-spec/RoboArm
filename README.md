@@ -1,17 +1,17 @@
 # RoboArm
 
-A 6-DOF robot arm I designed and built from scratch, running on a real ROS 2 / MoveIt 2 stack. Everything in this repo drives actual hardware, not a simulation.
+A 6-DOF robot arm I designed and built from scratch, running on a ROS 2 / MoveIt 2 stack.
 
 ## What this is
 
-Six joints, each driven by a stepper motor through a custom gear reduction: 27:1 cycloidal drives for the base, shoulder, and elbow, a 5:1 planetary drive for the forearm roll, and a 6:1 differential for the wrist pitch and roll. The structure is 3D printed in PLA-CF, designed in Onshape.
+Six joints, each driven by a stepper motor with a custom gearbox: 27:1 cycloidal drives for the base, shoulder, and elbow, a 5:1 planetary drive for the forearm roll, and a 6:1 belt-driven differential for the wrist pitch and roll. The structure is 3D printed in PLA, designed in Fusion 360.
 
-Motion planning goes through MoveIt 2, but the hardware interface underneath it is custom. The stepper controllers (CANBUS Stepper boards, closed loop, daisy chained over CAN) don't fit cleanly into `ros2_control` on this setup, so I wrote a standalone ROS 2 node that acts as the `FollowJointTrajectory` action server MoveIt talks to directly. It turns planned trajectories into CAN bus position commands, verifies the arm actually reached each target using live encoder feedback, and publishes real `/joint_states` back to MoveIt.
+Motion planning goes through MoveIt 2, but the hardware interface underneath it is custom. The stepper controllers (CANBUS Stepper boards, closed loop, daisy chained over CAN) don't fit cleanly into `ros2_control` on this setup, so I wrote a standalone ROS 2 node that acts as the `FollowJointTrajectory` action server MoveIt talks to directly. It turns planned trajectories into CAN bus position commands, verifies the arm actually reached each target using live encoder feedback, and publishes `/joint_states` back to MoveIt.
 
 ## Highlights
 
 - Full 6-DOF planning through MoveIt 2, including a differential wrist where two motors jointly produce pitch and roll (no 1:1 joint-to-motor mapping)
-- A custom hardware driver that bypasses `ros2_control` entirely, with real arrival verification instead of just trusting planned timing
+- A custom hardware driver that bypasses `ros2_control` entirely, with arrival verification instead of just trusting planned timing
 - A companion desktop app for building and running multi-waypoint motion sequences: drag the arm into a pose in RViz, capture it as a waypoint, set a speed and pause time for that segment, and save the whole sequence under a name to reuse later
 - One click to start everything: attach the hardware, launch RViz, and open the sequencer together
 
