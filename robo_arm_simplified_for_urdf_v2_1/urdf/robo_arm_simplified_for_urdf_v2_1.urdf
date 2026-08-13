@@ -207,11 +207,11 @@
         <axis xyz="-0 -0 -1" />
         <parent link="link_0" />
         <child link="link_1" />
-        <!-- was type="continuous" with no limit tag - real range is -135deg to
-             +210deg (wiring constraint, corrected 2026-08-12). continuous joints
-             plan/interpolate in a wraparound space regardless of joint_limits.yaml,
-             which caused GUI values >180deg to normalize incorrectly and Execute
-             to fail on out-of-wrap trajectories. -->
+        <!-- Real range is -135deg to +210deg (wiring constraint). This has to be
+             a proper "revolute" joint with a limit tag, not "continuous" -
+             continuous joints plan/interpolate in a wraparound space regardless
+             of joint_limits.yaml, which breaks Execute on any trajectory whose
+             values fall outside a plain +-180deg window. -->
         <limit effort="1" velocity="1" lower="-2.356194" upper="3.665191" />
     </joint>
     <joint name="revolute_2" type="revolute">
@@ -226,9 +226,8 @@
         <axis xyz="-0 1 -0" />
         <parent link="link_2" />
         <child link="link_3" />
-        <!-- was type="continuous" with no limit tag - real range is -45deg to
-             +405deg (verified 2026-08-11), see revolute_1 comment above for why
-             continuous joints without a limit tag broke MoveIt's planning here. -->
+        <!-- Real range is -45deg to +405deg - see revolute_1 above for why this
+             has to be "revolute" with a limit tag, not "continuous". -->
         <limit effort="1" velocity="1" lower="-0.785398" upper="7.068583" />
     </joint>
     <joint name="revolute_4" type="revolute">
@@ -239,8 +238,8 @@
         <axis xyz="-0 -1 -0" />
         <parent link="link_3" />
         <child link="link_4" />
-        <!-- was type="continuous" with no limit tag - real range is +-180deg,
-             see revolute_1 comment above for why that broke MoveIt's planning. -->
+        <!-- Real range is +-180deg - see revolute_1 above for why this has to
+             be "revolute" with a limit tag, not "continuous". -->
         <limit effort="1" velocity="1" lower="-3.141593" upper="3.141593" />
     </joint>
     <joint name="revolute_5" type="revolute">
@@ -255,8 +254,8 @@
         <axis xyz="-0 -1 -0" />
         <parent link="link_5" />
         <child link="link_6" />
-        <!-- was type="continuous" with no limit tag - real range is +-180deg roll,
-             see revolute_1 comment above for why that broke MoveIt's planning. -->
+        <!-- Real range is +-180deg roll - see revolute_1 above for why this has
+             to be "revolute" with a limit tag, not "continuous". -->
         <limit effort="1" velocity="1" lower="-3.141593" upper="3.141593" />
     </joint>
 </robot>

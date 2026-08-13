@@ -4,18 +4,14 @@
 # MoveIt should not try to activate/switch controllers itself, just send trajectories.
 moveit_manage_controllers: false
 
-# Execution duration monitoring (corrected 2026-08-13): MoveIt watches the clock while
-# a trajectory executes and aborts with TIMED_OUT if it runs long relative to the
-# planned duration. Defaults (1.1x scaling + 0.5s margin) are too tight for this
-# hardware - large single-joint rotations (e.g. J3) legitimately take several real
-# seconds, and canbus_bridge.py's own arrival verification adds up to a few more
-# seconds on top of that. Loosened so real, successful motion isn't mistaken for a
-# timeout. MUST be nested under trajectory_execution: - the C++ code
-# (trajectory_execution_manager.cpp) reads these as "trajectory_execution.<name>",
-# not as bare top-level keys. A first attempt at this fix used bare top-level keys;
-# ros2 param get confirmed they were set on the node, but under the wrong (unprefixed)
-# name, so they were silently ignored - the node was still using its built-in
-# defaults the whole time despite the yaml "successfully" loading.
+# Execution duration monitoring: MoveIt watches the clock while a trajectory
+# executes and aborts with TIMED_OUT if it runs long relative to the planned
+# duration. The defaults (1.1x scaling + 0.5s margin) are too tight for this
+# hardware - large single-joint rotations (e.g. J3) legitimately take several
+# real seconds, plus canbus_bridge.py's own arrival verification adds a bit
+# more on top of that. These must stay nested under trajectory_execution: -
+# the underlying C++ node reads them as "trajectory_execution.<name>", not as
+# bare top-level keys.
 trajectory_execution:
   allowed_execution_duration_scaling: 3.0   # was 1.1
   allowed_goal_duration_margin: 5.0         # was 0.5

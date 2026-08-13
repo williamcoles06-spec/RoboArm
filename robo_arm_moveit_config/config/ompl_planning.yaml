@@ -12,13 +12,12 @@ response_adapters:
   - default_planning_response_adapters/ValidateSolution
   - default_planning_response_adapters/DisplayMotionPath
 
-# Root-caused 2026-08-13: OMPL's default collision-checking resolution while
-# SEARCHING (1% of the state space's max extent) is coarser than MoveIt's final
-# ValidateSolution re-check after planning. That gap let OMPL hand over paths
-# that "looked" collision-free at its own sample points but actually clipped
-# through a real link_1/link_6 self-collision between them - caught every time
-# by ValidateSolution (INVALID_MOTION_PLAN), but never avoided during the
-# search itself. Tightened 10x so the search can't accept what the final check
-# would reject.
+# OMPL's default collision-checking resolution while searching (1% of the
+# state space's max extent) is coarser than MoveIt's final ValidateSolution
+# re-check after planning. That gap let OMPL hand over paths that looked
+# collision-free at its own sample points but actually clipped through a real
+# self-collision between the base and the wrist - caught by the final check,
+# but never avoided during the search itself. Tightened 10x so the search
+# can't accept what the final check would reject.
 arm:
   longest_valid_segment_fraction: 0.001

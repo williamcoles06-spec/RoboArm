@@ -49,25 +49,23 @@ NORMAL_SPEED_ARM_DEG_S = 1600.0   # must match the flashed value in §3
 NORMAL_SPEED_WRIST_DEG_S = 6400.0
 HOMING_SETTLE_S = 3.0             # crude wait for the homing creep to finish
 
-# Arrival verification (§ post-2026-08-13 fix): execute_trajectory used to
-# declare success once it had sent every commanded point and the nominal
-# duration elapsed, without ever checking the encoders actually got there.
-# If a trajectory got overridden mid-flight (e.g. two goals in flight at
-# once), it would still report success. Now it polls real encoder positions
-# against the final commanded point before succeeding.
+# Arrival verification: execute_trajectory doesn't just trust that the
+# commanded time elapsed - it polls the real encoders and confirms they
+# actually reached the final commanded point before reporting success. This
+# also protects against a trajectory getting silently overridden mid-flight.
 ARRIVAL_TOLERANCE_RAD = 0.02
 ARRIVAL_TIMEOUT_S = 3.0
 ARRIVAL_POLL_INTERVAL_S = 0.1
 
-# Root-caused 2026-08-13: MoveIt's time-parameterized trajectories pack in a new
-# waypoint roughly every 0.1s. These boards run their OWN onboard trapezoidal
-# motion profile per set_position() command - getting redirected to a new target
-# every 0.1s never gives that profile time to actually accelerate, so the arm
-# just twitches near its starting point for the whole trajectory instead of
-# traveling. Downsample to give the board real time to move between updates,
-# while still following the same overall path MoveIt validated as collision-free
-# (never skip straight from start to the final point - that would throw away the
-# collision-avoiding shape of the path).
+# MoveIt's time-parameterized trajectories pack in a new waypoint roughly
+# every 0.1s. These boards run their own onboard trapezoidal motion profile
+# per set_position() command, and redirecting it to a new target every 0.1s
+# never gives that profile time to actually accelerate - the arm just
+# twitches near its starting point instead of traveling. Downsampling gives
+# the board real time to move between updates, while still following the
+# same overall path MoveIt validated as collision-free (never skip straight
+# from start to the final point - that would throw away the shape of the
+# path OMPL used to avoid a collision).
 MIN_SEND_INTERVAL_S = 0.5
 
 # ---------------------------------------------------------------------------
@@ -77,31 +75,26 @@ MIN_SEND_INTERVAL_S = 0.5
 # J1-J4: simple geared joints. motor_deg = joint_deg * ratio * dir + home_deg
 # All values from ROBOT_ARM_HANDOFF.md §3.
 JOINTS = {
-    # dir verified 2026-08-11: physical moved opposite RViz at dir=-1, flipped to +1.
-    # limits corrected 2026-08-12: wiring is asymmetric about home, like J3 - real
-    # safe range is -135deg to +210deg, not symmetric +-180.
+    # J1: wiring is asymmetric about home, like J3 - real safe range is
+    # -135deg to +210deg, not a symmetric +-180.
     "revolute_1": {"node_id": 1, "ratio": 27.0, "dir": 1,
                    "home_deg": -52.65, "min_rad": math.radians(-135), "max_rad": math.radians(210)},
-    # dir verified 2026-08-11: physical moved opposite RViz at dir=-1, flipped to +1.
     "revolute_2": {"node_id": 2, "ratio": 27.0, "dir": 1,
                    "home_deg": 236.81, "min_rad": math.radians(-90), "max_rad": math.radians(90)},
-    # dir verified 2026-08-11: physical moved opposite RViz at dir=-1, flipped to +1.
-    # limits verified 2026-08-11: physical range is -45deg to +405deg, not symmetric about home.
+    # J3: physical range is -45deg to +405deg, not symmetric about home.
     "revolute_3": {"node_id": 3, "ratio": 27.0, "dir": 1,
                    "home_deg": 180.22, "min_rad": math.radians(-45), "max_rad": math.radians(405)},
-    # dir verified 2026-08-11: matched RViz at dir=+1, no change needed.
     "revolute_4": {"node_id": 4, "ratio": 5.0, "dir": 1,
                    "home_deg": 35.44, "min_rad": math.radians(-180), "max_rad": math.radians(180)},
 }
 
 # J5/J6: differential wrist, no 1:1 joint mapping - see §6.
 # revolute_5 = pitch (joint radians), revolute_6 = roll (joint radians).
-# s5/s6 are placeholders - NOT yet verified, see §8.
 WRIST = {
     "node5_id": 5, "node6_id": 6,
     "home5_deg": 138.83, "home6_deg": -35.89,
     "R": 6.0,
-    "s5": 1, "s6": -1,  # verified 2026-08-11: same-direction motor motion = roll, not pitch
+    "s5": 1, "s6": -1,  # same-direction motor motion on both nodes = roll, not pitch
     "pitch_limit_rad": math.radians(90),
     "roll_limit_rad": math.radians(180),
 }
@@ -330,9 +323,8 @@ class CanbusBridge(Node):
             return self._execute_trajectory_inner(goal_handle)
         except Exception as e:
             # Guarantees MoveGroup always gets a real response - an unhandled
-            # exception here previously meant no result was ever sent back, so
-            # MoveGroup just hung until its own timeout gave up, no matter how
-            # generous that timeout was set (see 2026-08-13 notes).
+            # exception here would otherwise mean no result is ever sent back,
+            # so MoveGroup just hangs until its own timeout gives up.
             self.get_logger().error(f"unexpected error in trajectory execution: {e}")
             goal_handle.abort()
             result = FollowJointTrajectory.Result()

@@ -1,0 +1,53 @@
+{
+  "name": "Linkedin Demo",
+  "waypoints": [
+    {
+      "positions": {
+        "revolute_1": 1.80313068724934,
+        "revolute_2": -0.7865856780276608,
+        "revolute_3": 5.048148403783823,
+        "revolute_4": -1.5713451807418701,
+        "revolute_5": -0.4494692237481158,
+        "revolute_6": -0.23092857475896447
+      },
+      "velocity_scaling": 0.8,
+      "wait_after": 2.0
+    },
+    {
+      "positions": {
+        "revolute_1": -0.9906572128032706,
+        "revolute_2": -0.7964967339630263,
+        "revolute_3": 5.138079850300675,
+        "revolute_4": -1.569123409412562,
+        "revolute_5": -0.34785875906438174,
+        "revolute_6": 2.5606709449711182
+      },
+      "velocity_scaling": 0.8,
+      "wait_after": 2.0
+    },
+    {
+      "positions": {
+        "revolute_1": 0.521184336918805,
+        "revolute_2": -0.8884554170197072,
+        "revolute_3": 4.240518050520767,
+        "revolute_4": -1.569861253649788,
+        "revolute_5": -1.1545013635222938,
+        "revolute_6": 1.0499218177385234
+      },
+      "velocity_scaling": 0.8,
+      "wait_after": 2.0
+    },
+    {
+      "positions": {
+        "revolute_1": 0.0003147501320328306,
+        "revolute_2": -0.00012053427639460407,
+        "revolute_3": -5.699085824292753e-05,
+        "revolute_4": 0.0006969045161674313,
+        "revolute_5": -0.0009491932230817008,
+        "revolute_6": -0.00022095004755880472
+      },
+      "velocity_scaling": 0.8,
+      "wait_after": 2.0
+    }
+  ]
+}
